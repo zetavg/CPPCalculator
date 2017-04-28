@@ -7,9 +7,10 @@
 class Integer {
  public:
     Integer();
-    Integer(std::string number);
-    Integer& set_value(std::string);
+    Integer(const char*);
+    Integer& set_value(const char*);
     std::string get_value();
+    Integer& operator=(const char*);
     friend std::ostream& operator<<(std::ostream &out, Integer &integer);
     friend std::istream& operator>>(std::istream &in, Integer &integer);
     friend Integer operator+(Integer &a, Integer &b);

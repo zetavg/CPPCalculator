@@ -28,7 +28,7 @@ ARFLAGS = rv
 CPPFLAGS += -isystem $(GTEST_DIR)/include
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra -pthread -std=c++1y
+CXXFLAGS += -g -Wall -Wextra -pthread -std=c++0x
 
 # All Google Test headers.
 GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
