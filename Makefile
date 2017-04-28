@@ -10,7 +10,7 @@ SOURCE_DIR = ./src
 
 # All tests produced by this Makefile.
 # Remember to add new tests you created to the list.
-TESTS = sample1_test sample2_test
+TESTS = Integer_test
 TEST_OBJ_FILES = $(shell echo "$(TESTS) " | sed 's/ /\.o /g')
 TEST_TARGET_OBJ_FILES = $(shell echo "$(TESTS) " | sed 's/_test /\.o /g')
 
@@ -28,7 +28,7 @@ ARFLAGS = rv
 CPPFLAGS += -isystem $(GTEST_DIR)/include
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra -pthread
+CXXFLAGS += -g -Wall -Wextra -pthread -std=c++1y
 
 # All Google Test headers.
 GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
