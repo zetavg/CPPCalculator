@@ -45,7 +45,7 @@ test : all_tests
 	./all_tests
 
 clean :
-	rm -f $(TESTS) gtest.a gtest_main.a *.o *_test
+	rm -f $(TESTS) gtest.a gtest_main.a *.o *_test *_tests
 
 # General rules.
 

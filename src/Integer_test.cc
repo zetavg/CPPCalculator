@@ -7,16 +7,24 @@
 
 // Test constructor of Integer
 TEST(IntegerTest, Constructor) {
-    Integer i0;
-    EXPECT_STREQ(i0.get_value().c_str(), "null");
-    Integer i1 { "0" };
-    EXPECT_STREQ(i1.get_value().c_str(), "0");
-    Integer i2 { "99" };
-    EXPECT_STREQ(i2.get_value().c_str(), "99");
-    Integer i3 { "99+9" };
-    EXPECT_STREQ(i3.get_value().c_str(), "99");
-    Integer i4 { "0123" };
-    EXPECT_STREQ(i4.get_value().c_str(), "123");
+    Integer integer_0;
+    EXPECT_STREQ(integer_0.get_value().c_str(), "null");
+    Integer integer_1 { "0" };
+    EXPECT_STREQ(integer_1.get_value().c_str(), "0");
+    Integer integer_2 { "99" };
+    EXPECT_STREQ(integer_2.get_value().c_str(), "99");
+    Integer integer_3 { "-99" };
+    EXPECT_STREQ(integer_2.get_value().c_str(), "-99");
+    Integer integer_4 { "99+9" };
+    EXPECT_STREQ(integer_3.get_value().c_str(), "99");
+    Integer integer_5 { "0123" };
+    EXPECT_STREQ(integer_4.get_value().c_str(), "123");
+}
+
+// Test constructor of big Integer
+TEST(IntegerTest, Constructor_BigValue) {
+    Integer big_integer { "12345678901234567890123456789012345678901234567890123456789012345678901234567890" };
+    EXPECT_STREQ(big_integer.get_value().c_str(), "12345678901234567890123456789012345678901234567890123456789012345678901234567890");
 }
 
 // Test operator << of Integer
@@ -42,16 +50,47 @@ TEST(IntegerTest, AdditionOperator) {
     EXPECT_STREQ((a + b).get_value().c_str(), "1337");
 }
 
+// Test operator + of Integer with big values
+TEST(IntegerTest, AdditionOperator_BigValue) {
+    Integer a { "12345678901234567890123456789012345678901234567890123456789012345678901234567890" };
+    Integer b { "-12345678901234567890123456789012345678901234567890123456789012345678901234567890" };
+    Integer c { "87654321098765432109876543210987654321098765432109876543210987654321098765432110" };
+    EXPECT_STREQ((a + a).get_value().c_str(), "24691357802469135780246913578024691357802469135780246913578024691357802469135780");
+    EXPECT_STREQ((a + b).get_value().c_str(), "0");
+    EXPECT_STREQ((a + c).get_value().c_str(), "100000000000000000000000000000000000000000000000000000000000000000000000000000000");
+}
+
 // Test operator - of Integer
 TEST(IntegerTest, SubtractionOperator) {
     Integer a { "65535" }, b { "64198" };
     EXPECT_STREQ((a - b).get_value().c_str(), "1337");
 }
 
+// Test operator - of Integer with big values
+TEST(IntegerTest, SubtractionOperator_BigValue) {
+    Integer a { "12345678901234567890123456789012345678901234567890123456789012345678901234567890" };
+    Integer b { "-12345678901234567890123456789012345678901234567890123456789012345678901234567890" };
+    Integer c { "1234567890123456789012345678901234567890123456789012345678901234567890123456789" };
+    Integer d { "123456789012345678901234567890123456789012345678901234567890123456789012345678900" };
+    EXPECT_STREQ((a - a).get_value().c_str(), "0");
+    EXPECT_STREQ((a - b).get_value().c_str(), "24691357802469135780246913578024691357802469135780246913578024691357802469135780");
+    EXPECT_STREQ((a - c).get_value().c_str(), "-111111110111111111011111111101111111110111111111011111111101111111110111111111010");
+}
+
 // Test operator * of Integer
 TEST(IntegerTest, MultiplicationOperator) {
     Integer a { "1024" }, b { "768" };
     EXPECT_STREQ((a * b).get_value().c_str(), "786432");
+}
+
+// Test operator * of Integer with big values
+TEST(IntegerTest, MultiplicationOperator_BigValue) {
+    Integer a { "12345678901234567890123456789012345678901234567890123456789012345678901234567890" };
+    Integer b { "-12345678901234567890123456789012345678901234567890123456789012345678901234567890" };
+    Integer c { "-1" };
+    EXPECT_STREQ((a * a).get_value().c_str(), "152415787532388367504953515625666819450083828733760097552251181223112635269100012193273126047859425087639153757049236500533455762536198787501905199875019052100");
+    EXPECT_STREQ((a * b).get_value().c_str(), "-152415787532388367504953515625666819450083828733760097552251181223112635269100012193273126047859425087639153757049236500533455762536198787501905199875019052100");
+    EXPECT_STREQ((b * c).get_value().c_str(), "12345678901234567890123456789012345678901234567890123456789012345678901234567890");
 }
 
 // Test operator / of Integer
