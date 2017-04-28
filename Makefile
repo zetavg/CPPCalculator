@@ -11,12 +11,16 @@ SOURCE_DIR = ./src
 # All tests produced by this Makefile.
 # Remember to add new tests you created to the list.
 TESTS = sample1_test sample2_test
+TEST_OBJ_FILES = $(shell echo "$(TESTS) " | sed 's/ /\.o /g')
+TEST_TARGET_OBJ_FILES = $(shell echo "$(TESTS) " | sed 's/_test /\.o /g')
 
 # Points to the root of Google Test, relative to where this file is.
 # Remember to tweak this if you move this file.
 GTEST_DIR = ./googletest/googletest
 
 CXX = g++
+AR = ar
+ARFLAGS = rv
 
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
@@ -32,8 +36,13 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 
 # House-keeping build targets.
 
-test : $(TESTS)
-	printf "%s\0" $^ | xargs -0 -I TEST bash -c ./TEST
+# Run all tests, method 1.
+# test : $(TESTS)
+# 	printf "%s\0" $^ | xargs -0 -I TEST bash -c ./TEST
+
+# Run all tests, method 2.
+test : all_tests
+	./all_tests
 
 clean :
 	rm -f $(TESTS) gtest.a gtest_main.a *.o *_test
@@ -74,4 +83,7 @@ gtest_main.a : gtest-all.o gtest_main.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $<
 
 %_test : %.o %_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+all_tests : $(TEST_TARGET_OBJ_FILES) $(TEST_OBJ_FILES) gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
