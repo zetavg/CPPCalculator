@@ -3,6 +3,9 @@
 
 #include <string>
 #include <iostream>
+#include <vector>
+
+typedef char integer_digit_t;
 
 class Integer {
  public:
@@ -16,10 +19,13 @@ class Integer {
     friend Integer operator+(Integer &a, Integer &b);
     friend Integer operator-(Integer &a, Integer &b);
     friend Integer operator*(Integer &a, Integer &b);
+    friend bool operator<(Integer &a, Integer &b);
+    friend bool operator>(Integer &a, Integer &b);
     // friend Integer operator/(Integer &a, Integer &b);
  private:
-    int value;
-    bool is_null;
+    std::vector<integer_digit_t> value;
+    bool sign;
+    void arrange();
 };
 
 #endif
