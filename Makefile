@@ -30,6 +30,9 @@ CPPFLAGS += -isystem $(GTEST_DIR)/include
 # Flags passed to the C++ compiler.
 CXXFLAGS += -g -Wall -Wextra -pthread -std=c++0x
 
+# Flags to add for test coverage info.
+test : COVERAGE_FLAGS_ += -fprofile-arcs -ftest-coverage
+
 # All Google Test headers.
 GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
                 $(GTEST_DIR)/include/gtest/internal/*.h
@@ -45,12 +48,12 @@ test : all_tests
 	./all_tests
 
 clean :
-	rm -f $(TESTS) gtest.a gtest_main.a *.o *_test *_tests
+	rm -f $(TESTS) gtest.a gtest_main.a *.o *_test *_tests *.gcda *.gcno
 
 # General rules.
 
 %.o : $(SOURCE_DIR)/%.cc $(SOURCE_DIR)/%.h $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $<
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(COVERAGE_FLAGS_) -c $<
 
 # Builds gtest.a and gtest_main.a.
 
@@ -86,4 +89,4 @@ gtest_main.a : gtest-all.o gtest_main.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 all_tests : $(TEST_TARGET_OBJ_FILES) $(TEST_OBJ_FILES) gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(COVERAGE_FLAGS_) -lpthread $^ -o $@

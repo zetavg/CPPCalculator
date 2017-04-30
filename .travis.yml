@@ -2,3 +2,9 @@ language: cpp
 compiler:
   - g++
 script: make test
+before_install:
+  - pip install --user requests[security]
+  - pip install --user cpp-coveralls
+cache: pip
+after_success:
+  - coveralls --exclude googletest
