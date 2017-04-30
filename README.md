@@ -1,6 +1,9 @@
 CPPCalculator
 =============
 
+[![Build Status](https://travis-ci.org/zetavg/CPPCalculator.svg?branch=develop)](https://travis-ci.org/zetavg/CPPCalculator)
+[![Coverage Status](https://coveralls.io/repos/github/zetavg/CPPCalculator/badge.svg?branch=develop)](https://coveralls.io/github/zetavg/CPPCalculator?branch=develop)
+
 This is a project of object oriented programming in C++.
 
 
