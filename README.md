@@ -21,3 +21,5 @@ The following command will run all the test suits in this project:
 ```bash
 $ make test
 ```
+
+To view the test coverage report, run `make coverage` then open `coverage/index.html`

@@ -1,6 +1,9 @@
 *.o
 /*_test
 /all_tests
+/gtest_main.a
 *.gcda
 *.gcno
-/gtest_main.a
+*.gcov
+/cov.info
+/coverage

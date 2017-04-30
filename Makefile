@@ -31,7 +31,9 @@ CPPFLAGS += -isystem $(GTEST_DIR)/include
 CXXFLAGS += -g -Wall -Wextra -pthread -std=c++0x
 
 # Flags to add for test coverage info.
-test : COVERAGE_FLAGS_ += -fprofile-arcs -ftest-coverage
+COVERAGE_FLAGS = -fprofile-arcs -ftest-coverage
+test : COVERAGE_FLAGS_ += $(COVERAGE_FLAGS)
+coverage : COVERAGE_FLAGS_ += $(COVERAGE_FLAGS)
 
 # All Google Test headers.
 GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
@@ -45,10 +47,13 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 
 # Run all tests, method 2.
 test : all_tests
-	./all_tests
+	rm -f *.gcda && ./all_tests
+
+coverage : test cov.info
+	genhtml cov.info -o coverage
 
 clean :
-	rm -f $(TESTS) gtest.a gtest_main.a *.o *_test *_tests *.gcda *.gcno
+	rm -rf $(TESTS) gtest.a gtest_main.a *.o *_test *_tests *.gcda *.gcno *.gcov cov.info coverage
 
 # General rules.
 
@@ -70,7 +75,7 @@ gtest-all.o : $(GTEST_SRCS_)
             $(GTEST_DIR)/src/gtest-all.cc
 
 gtest_main.o : $(GTEST_SRCS_)
-	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) -c \
+	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) $(COVERAGE_FLAGS_) -c \
             $(GTEST_DIR)/src/gtest_main.cc
 
 gtest.a : gtest-all.o
@@ -90,3 +95,11 @@ gtest_main.a : gtest-all.o gtest_main.o
 
 all_tests : $(TEST_TARGET_OBJ_FILES) $(TEST_OBJ_FILES) gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(COVERAGE_FLAGS_) -lpthread $^ -o $@
+
+# Coverage report
+
+gcov :
+	gcov -gcda=gtest_main.gcda -gcno=gtest_main.gcno googletest/googletest/src/gtest_main.cc
+
+cov.info : gcov
+	lcov --directory . --base-directory src --no-external --capture -o cov.info && lcov --remove cov.info '*/googletest/*' -o cov.info
