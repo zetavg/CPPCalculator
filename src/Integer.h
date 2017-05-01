@@ -13,14 +13,18 @@ class Integer {
     /* Constructors */
     Integer();
     Integer(const char*);
+    Integer(const Integer &);
     /* Getter and setters */
     Integer& set_value(const char*);
     std::string get_value();
+    Integer& copy_value_from(const Integer &);
     /* Overload operators */
     Integer& operator=(const char*);
+    Integer& operator=(const Integer &);
     friend std::ostream& operator<<(std::ostream &out, Integer &integer);
     friend std::istream& operator>>(std::istream &in, Integer &integer);
     friend Integer operator+(Integer &a, Integer &b);
+    friend Integer operator-(Integer &integer);
     friend Integer operator-(Integer &a, Integer &b);
     friend Integer operator*(Integer &a, Integer &b);
     friend bool operator<(Integer &a, Integer &b);
@@ -28,8 +32,8 @@ class Integer {
     // friend Integer operator/(Integer &a, Integer &b);
  private:
     /* Private members */
-    integer_value_t value;
     bool sign;
+    integer_value_t value;
     /* Private methods */
     void arrange(); // Remove leading zeros from the value
 };

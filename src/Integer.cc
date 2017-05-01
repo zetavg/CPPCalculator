@@ -18,6 +18,11 @@ Integer::Integer(const char *number) {
     set_value(number);
 }
 
+
+Integer::Integer(const Integer &integer) {
+    copy_value_from(integer);
+}
+
 /*
  * Getter and setters
  */
@@ -28,7 +33,7 @@ Integer& Integer::set_value(const char *number) {
 
     if (strcmp(number, "null") != 0) {
         int last;
-        for (last = 0; number[last] != '\0'; ++last);
+        for (last = 0; number[last] != '\0'; ++last) continue;
 
         for (int i = last - 1; i >= 0; --i) {
             if (number[i] == '-') {
@@ -62,11 +67,19 @@ std::string Integer::get_value() {
     }
 }
 
+Integer& Integer::copy_value_from(const Integer &reference) {
+    sign = reference.sign;
+    value = integer_value_t(reference.value);
+    return *this;
+}
+
 /*
  * Value calculation helpers
  */
 
-integer_value_t add_value(integer_value_t &a, integer_value_t &b) {
+
+// Adds up two integer_value_t, and return the sum
+integer_value_t addup_raw_value(integer_value_t &a, integer_value_t &b) {
     integer_value_t result;
     int a_size = a.size();
     int b_size = b.size();
@@ -85,7 +98,12 @@ integer_value_t add_value(integer_value_t &a, integer_value_t &b) {
     return result;
 }
 
-integer_value_t subtract_value(integer_value_t &a, integer_value_t &b) {
+// Subtracts two integer_value_t (a - b), and return the remaining value
+//
+// The first value must be larger then the second one. It is the client's
+// responsibility to ensure the inputs are valid, and to deal with the leading
+// zeros of the result.
+integer_value_t substractdown_raw_value(integer_value_t &a, integer_value_t &b) {
     integer_value_t result;
     int a_size = a.size();
     int b_size = b.size();
@@ -104,7 +122,11 @@ integer_value_t subtract_value(integer_value_t &a, integer_value_t &b) {
     return result;
 }
 
-int compare_value(integer_value_t &a, integer_value_t &b) {
+// Compares two integer_value_t
+//
+// Returns 1 if the first one is larger then the second, -1 if smaller,
+// or 0 if same.
+int compare_raw_value(integer_value_t &a, integer_value_t &b) {
     int a_size = a.size();
     int b_size = b.size();
 
@@ -139,6 +161,11 @@ Integer& Integer::operator=(const char *number) {
     return *this;
 }
 
+Integer& Integer::operator=(const Integer &integer) {
+    copy_value_from(integer);
+    return *this;
+}
+
 std::ostream& operator<<(std::ostream &out, Integer &integer) {
     out << integer.get_value();
     return out;
@@ -157,14 +184,14 @@ Integer operator+(Integer &a, Integer &b) {
         // simply add the values if both a and b are both positive
         Integer result;
         result.sign = true;
-        result.value = add_value(a.value, b.value);
+        result.value = addup_raw_value(a.value, b.value);
         return result;
 
     } else if (!a.sign && !b.sign) {
         // add the values and set the sign to negative if both a and b are both negative
         Integer result;
         result.sign = false;
-        result.value = add_value(a.value, b.value);
+        result.value = addup_raw_value(a.value, b.value);
         return result;
 
     } else {
@@ -181,33 +208,40 @@ Integer operator+(Integer &a, Integer &b) {
         }
 
         // compare the values to decide what to do
-        int comparing_result = compare_value(positive_integer->value, negative_integer->value);
+        int comparing_result = compare_raw_value(positive_integer->value, negative_integer->value);
 
         if (comparing_result > 0) {
             // the positive value is larger then the negative value
             Integer result;
             result.sign = true;
-            result.value = subtract_value(positive_integer->value, negative_integer->value);
+            result.value = substractdown_raw_value(positive_integer->value, negative_integer->value);
             result.arrange();
             return result;
         } else if (comparing_result < 0) {
             // the negative value is larger then the positive value
             Integer result;
             result.sign = false;
-            result.value = subtract_value(negative_integer->value, positive_integer->value);
+            result.value = substractdown_raw_value(negative_integer->value, positive_integer->value);
             result.arrange();
             return result;
         } else {
-            // the values are the same
+            // the two values are same
             Integer result("0");
             return result;
         }
     }
 }
 
-// Integer operator-(Integer &a, Integer &b) {
-//     return Integer();
-// }
+Integer operator-(Integer &integer) {
+    Integer result(integer);
+    result.sign = !integer.sign;
+    return result;
+}
+
+Integer operator-(Integer &a, Integer &b) {
+    Integer negative_b = -b;
+    return (a + negative_b);
+}
 
 // Integer operator*(Integer &a, Integer &b) {
 //     return Integer();

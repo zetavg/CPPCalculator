@@ -50,7 +50,7 @@ test : all_tests
 	rm -f *.gcda && ./all_tests
 
 coverage : test cov.info
-	genhtml cov.info -o coverage
+	genhtml cov.info -o coverage && echo "Coverage report generated at $(shell pwd)/coverage/index.html"
 
 clean :
 	rm -rf $(TESTS) gtest.a gtest_main.a *.o *_test *_tests *.gcda *.gcno *.gcov cov.info coverage
