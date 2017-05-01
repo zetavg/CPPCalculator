@@ -5,6 +5,11 @@ script: make test
 before_install:
   - pip install --user requests[security]
   - pip install --user cpp-coveralls
+  - curl -L https://s3.amazonaws.com/codeclimate/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
 cache: pip
+before_script:
+  - ./cc-test-reporter before-build
 after_success:
   - coveralls --exclude googletest
+  - ./cc-test-reporter after-build
