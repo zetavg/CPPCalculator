@@ -77,7 +77,6 @@ Integer& Integer::copy_value_from(const Integer &reference) {
  * Value calculation helpers
  */
 
-
 // Adds up two integer_value_t, and return the sum
 integer_value_t addup_raw_value(integer_value_t &a, integer_value_t &b) {
     integer_value_t result;
@@ -100,7 +99,7 @@ integer_value_t addup_raw_value(integer_value_t &a, integer_value_t &b) {
 
 // Subtracts two integer_value_t (a - b), and return the remaining value
 //
-// The first value must be larger then the second one. It is the client's
+// The first value must be larger then the second one. It is the caller's
 // responsibility to ensure the inputs are valid, and to deal with the leading
 // zeros of the result.
 integer_value_t substractdown_raw_value(integer_value_t &a, integer_value_t &b) {
@@ -117,6 +116,35 @@ integer_value_t substractdown_raw_value(integer_value_t &a, integer_value_t &b) 
             carry = -1;
         }
         result.push_back(digit);
+    }
+
+    return result;
+}
+
+// Multiply two integer_value_t (a * b)
+integer_value_t multiply_raw_value(integer_value_t &a, integer_value_t &b) {
+    integer_value_t result;
+    int a_size = a.size();
+    int b_size = b.size();
+
+    for (int i = 0, carry = 0; i < a_size; ++i) {
+        for (int j = 0; j < b_size; ++j) {
+            int p = i + j;
+            integer_digit_t digit = a.at(i) * b.at(j) + carry;
+            if (result.size() > p) digit += result.at(p);
+            carry = digit / 10;
+            digit = digit % 10;
+            if (result.size() > p) {
+                result.at(p) = digit;
+            } else {
+                result.push_back(digit);
+            }
+        }
+
+        if (carry > 0) {
+            result.push_back(carry);
+            carry = 0;
+        }
     }
 
     return result;
@@ -243,9 +271,12 @@ Integer operator-(Integer &a, Integer &b) {
     return (a + negative_b);
 }
 
-// Integer operator*(Integer &a, Integer &b) {
-//     return Integer();
-// }
+Integer operator*(Integer &a, Integer &b) {
+    Integer result;
+    result.value = multiply_raw_value(a.value, b.value);
+    result.sign = a.sign == b.sign;
+    return result;
+}
 
 /*
  * Private methods
