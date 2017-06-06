@@ -36,6 +36,12 @@ class Integer {
     integer_value_t value;
     /* Private methods */
     void arrange(); // Remove leading zeros from the value
+ public:
+    /* Value calculation helpers */
+    static integer_value_t addup_raw_value(integer_value_t &a, integer_value_t &b);
+    static integer_value_t substractdown_raw_value(integer_value_t &a, integer_value_t &b);
+    static integer_value_t multiply_raw_value(integer_value_t &a, integer_value_t &b);
+    static int compare_raw_value(integer_value_t &a, integer_value_t &b);
 };
 
 #endif
