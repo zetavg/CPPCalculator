@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+ #include <climits>
 
 #include "Integer.h"
 
@@ -24,8 +25,8 @@ Decimal::Decimal(const char *number) {
 }
 
 
-Decimal::Decimal(const Decimal &integer) {
-    copy_value_from(integer);
+Decimal::Decimal(const Decimal &decimal) {
+    copy_value_from(decimal);
 }
 
 /*
@@ -99,15 +100,19 @@ std::string Decimal::get_value() {
             it >= denominator.begin() && denominator.end() - it < DECIMAL_APPROXIMATE_DENOMINATOR_MAX_DIGITS;
             --it
         ) {
-            approximate_denominator *= 10;
-            approximate_denominator += *it;
+            approximate_denominator *= (unsigned long long)10;
+            approximate_denominator += (unsigned long long)*it;
         }
 
         if (approximate_denominator == 0) approximate_denominator = 1;
 
         unsigned long long output_value_digits_after_decimal_point = 0;
         unsigned long long output_value_multiplier = 1;
-        while ((long long)std::pow(10, output_value_digits_after_decimal_point) % approximate_denominator > 0 && output_value_digits_after_decimal_point < DECIMAL_APPROXIMATE_DENOMINATOR_MAX_DIGITS) {
+        unsigned long long output_value_multiplier_max = ULLONG_MAX / 1000;
+        while (
+            (long long)std::pow(10, output_value_digits_after_decimal_point) % approximate_denominator > 0 &&
+            output_value_multiplier < output_value_multiplier_max
+        ) {
             ++output_value_digits_after_decimal_point;
             output_value_multiplier = std::pow(10, output_value_digits_after_decimal_point) / approximate_denominator;
         }
@@ -153,8 +158,11 @@ std::string Decimal::get_value() {
         }
 
         if (has_point) for (std::string::iterator it = str.end() - 1; it >= str.begin(); --it) {
-            if (*it == '0' || *it == '.') {
+            if (*it == '0') {
                 *it = '\0';
+            } else if (*it == '.') {
+                *it = '\0';
+                break;
             } else {
                 break;
             }
@@ -167,6 +175,7 @@ std::string Decimal::get_value() {
 Decimal& Decimal::copy_value_from(const Decimal &reference) {
     sign = reference.sign;
     molecular = decimal_value_t(reference.molecular);
+    denominator = decimal_value_t(reference.denominator);
     return *this;
 }
 
@@ -185,26 +194,86 @@ Decimal& Decimal::operator=(const char *number) {
     return *this;
 }
 
-Decimal& Decimal::operator=(const Decimal &integer) {
-    copy_value_from(integer);
+Decimal& Decimal::operator=(const Decimal &decimal) {
+    copy_value_from(decimal);
     return *this;
 }
 
-std::ostream& operator<<(std::ostream &out, Decimal &integer) {
-    out << integer.get_value();
+std::ostream& operator<<(std::ostream &out, Decimal &decimal) {
+    out << decimal.get_value();
     return out;
 }
 
-std::istream& operator>>(std::istream &in, Decimal &integer) {
+std::istream& operator>>(std::istream &in, Decimal &decimal) {
     std::string str;
     in >> str;
-    integer.set_value(str.c_str());
+    decimal.set_value(str.c_str());
 
     return in;
 }
 
 Decimal operator+(Decimal &a, Decimal &b) {
-    // TODO
+    // Make the denominator same
+    integer_value_t result_denominator = Integer::multiply_raw_value(a.denominator, b.denominator);
+
+    // Calculate the values after multiplication
+    integer_value_t a_molecular_after_multiplication = Integer::multiply_raw_value(a.molecular, b.denominator);
+    integer_value_t b_molecular_after_multiplication = Integer::multiply_raw_value(b.molecular, a.denominator);
+
+    if (a.sign && b.sign) {
+        // simply add the values if both a and b are both positive
+        Decimal result;
+        result.sign = true;
+        result.molecular = Integer::addup_raw_value(a_molecular_after_multiplication, b_molecular_after_multiplication);
+        result.denominator = result_denominator;
+        return result;
+
+    } else if (!a.sign && !b.sign) {
+        // add the values and set the sign to negative if both a and b are both negative
+        Decimal result;
+        result.sign = false;
+        result.molecular = Integer::addup_raw_value(a_molecular_after_multiplication, b_molecular_after_multiplication);
+        result.denominator = result_denominator;
+        return result;
+
+    } else {
+        // we need to compare the values and perform an substraction
+        integer_value_t positive_molecular_after_multiplication, negative_molecular_after_multiplication;
+
+        // find the positive and negative decimal
+        if (a.sign && !b.sign) {
+            positive_molecular_after_multiplication = a_molecular_after_multiplication;
+            negative_molecular_after_multiplication = b_molecular_after_multiplication;
+        } else {
+            positive_molecular_after_multiplication = b_molecular_after_multiplication;
+            negative_molecular_after_multiplication = a_molecular_after_multiplication;
+        }
+
+        // compare the values to decide what to do
+        int comparing_result = Integer::compare_raw_value(positive_molecular_after_multiplication, negative_molecular_after_multiplication);
+
+        if (comparing_result > 0) {
+            // the positive value is larger then the negative value
+            Decimal result;
+            result.sign = true;
+            result.molecular = Integer::substractdown_raw_value(positive_molecular_after_multiplication, negative_molecular_after_multiplication);
+            result.denominator = result_denominator;
+            result.arrange();
+            return result;
+        } else if (comparing_result < 0) {
+            // the negative value is larger then the positive value
+            Decimal result;
+            result.sign = false;
+            result.molecular = Integer::substractdown_raw_value(negative_molecular_after_multiplication, positive_molecular_after_multiplication);
+            result.denominator = result_denominator;
+            result.arrange();
+            return result;
+        } else {
+            // the two values are same
+            Decimal result("0");
+            return result;
+        }
+    }
 }
 
 Decimal operator-(Decimal &decimal) {
@@ -226,15 +295,20 @@ Decimal operator*(Decimal &a, Decimal &b) {
     return result;
 }
 
+Decimal operator/(Decimal &a, Decimal &b) {
+    Decimal result;
+    result.molecular = Integer::multiply_raw_value(a.molecular, b.denominator);
+    result.denominator = Integer::multiply_raw_value(a.denominator, b.molecular);
+    result.sign = a.sign == b.sign;
+    result.arrange();
+    return result;
+}
+
 /*
  * Private methods
  */
 
 void Decimal::arrange() {
-    while (molecular.size() > 1 && molecular.back() == 0) {
-        molecular.pop_back();
-    }
-    while (denominator.size() > 1 && denominator.back() == 0) {
-        denominator.pop_back();
-    }
+    molecular = Integer::arrange_raw_value(molecular);
+    denominator = Integer::arrange_raw_value(denominator);
 }

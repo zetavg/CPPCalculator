@@ -42,6 +42,7 @@ class Integer {
     static integer_value_t substractdown_raw_value(integer_value_t &a, integer_value_t &b);
     static integer_value_t multiply_raw_value(integer_value_t &a, integer_value_t &b);
     static int compare_raw_value(integer_value_t &a, integer_value_t &b);
+    static integer_value_t arrange_raw_value(integer_value_t &v);
 };
 
 #endif

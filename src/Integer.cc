@@ -180,6 +180,14 @@ int Integer::compare_raw_value(integer_value_t &a, integer_value_t &b) {
     }
 }
 
+integer_value_t Integer::arrange_raw_value(integer_value_t &v) {
+    while (v.size() > 1 && v.back() == 0) {
+        v.pop_back();
+    }
+
+    return v;
+}
+
 /*
  * Overload operators
  */
@@ -283,7 +291,5 @@ Integer operator*(Integer &a, Integer &b) {
  */
 
 void Integer::arrange() {
-    while (value.size() > 1 && value.back() == 0) {
-        value.pop_back();
-    }
+    value = Integer::arrange_raw_value(value);
 }

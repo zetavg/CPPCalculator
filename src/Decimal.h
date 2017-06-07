@@ -29,7 +29,7 @@ class Decimal {
     friend Decimal operator*(Decimal &a, Decimal &b);
     friend bool operator<(Decimal &a, Decimal &b);
     friend bool operator>(Decimal &a, Decimal &b);
-    // friend Decimal operator/(Decimal &a, Decimal &b);
+    friend Decimal operator/(Decimal &a, Decimal &b);
  private:
     /* Private members */
     bool sign;
@@ -37,6 +37,10 @@ class Decimal {
     /* Private methods */
     void arrange(); // Remove leading zeros from the value
     void simplify(); // Make fraction in lowest terms
+ public:
+    /* Value calculation helpers */
+    static decimal_value_t raw_value_gcd(decimal_value_t &a, decimal_value_t &b);
+    static decimal_value_t raw_value_remainder(decimal_value_t &a, decimal_value_t &b);
 };
 
 #endif
