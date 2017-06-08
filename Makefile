@@ -10,7 +10,7 @@ SOURCE_DIR = ./src
 
 # All tests produced by this Makefile.
 # Remember to add new tests you created to the list.
-TESTS = Integer_test
+TESTS = Integer_test Decimal_test
 TEST_OBJ_FILES = $(shell echo "$(TESTS) " | sed 's/ /\.o /g')
 TEST_TARGET_OBJ_FILES = $(shell echo "$(TESTS) " | sed 's/_test /\.o /g')
 

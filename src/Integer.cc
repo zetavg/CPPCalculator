@@ -78,7 +78,7 @@ Integer& Integer::copy_value_from(const Integer &reference) {
  */
 
 // Adds up two integer_value_t, and return the sum
-integer_value_t addup_raw_value(integer_value_t &a, integer_value_t &b) {
+integer_value_t Integer::addup_raw_value(integer_value_t &a, integer_value_t &b) {
     integer_value_t result;
     int a_size = a.size();
     int b_size = b.size();
@@ -102,7 +102,7 @@ integer_value_t addup_raw_value(integer_value_t &a, integer_value_t &b) {
 // The first value must be larger then the second one. It is the caller's
 // responsibility to ensure the inputs are valid, and to deal with the leading
 // zeros of the result.
-integer_value_t substractdown_raw_value(integer_value_t &a, integer_value_t &b) {
+integer_value_t Integer::substractdown_raw_value(integer_value_t &a, integer_value_t &b) {
     integer_value_t result;
     int a_size = a.size();
     int b_size = b.size();
@@ -122,14 +122,14 @@ integer_value_t substractdown_raw_value(integer_value_t &a, integer_value_t &b) 
 }
 
 // Multiply two integer_value_t (a * b)
-integer_value_t multiply_raw_value(integer_value_t &a, integer_value_t &b) {
+integer_value_t Integer::multiply_raw_value(integer_value_t &a, integer_value_t &b) {
     integer_value_t result;
     int a_size = a.size();
     int b_size = b.size();
 
     for (int i = 0, carry = 0; i < a_size; ++i) {
         for (int j = 0; j < b_size; ++j) {
-            int p = i + j;
+            unsigned long p = i + j;
             integer_digit_t digit = a.at(i) * b.at(j) + carry;
             if (result.size() > p) digit += result.at(p);
             carry = digit / 10;
@@ -154,7 +154,7 @@ integer_value_t multiply_raw_value(integer_value_t &a, integer_value_t &b) {
 //
 // Returns 1 if the first one is larger then the second, -1 if smaller,
 // or 0 if same.
-int compare_raw_value(integer_value_t &a, integer_value_t &b) {
+int Integer::compare_raw_value(integer_value_t &a, integer_value_t &b) {
     int a_size = a.size();
     int b_size = b.size();
 
@@ -178,6 +178,14 @@ int compare_raw_value(integer_value_t &a, integer_value_t &b) {
 
         return 0;
     }
+}
+
+integer_value_t Integer::arrange_raw_value(integer_value_t &v) {
+    while (v.size() > 1 && v.back() == 0) {
+        v.pop_back();
+    }
+
+    return v;
 }
 
 /*
@@ -212,14 +220,14 @@ Integer operator+(Integer &a, Integer &b) {
         // simply add the values if both a and b are both positive
         Integer result;
         result.sign = true;
-        result.value = addup_raw_value(a.value, b.value);
+        result.value = Integer::addup_raw_value(a.value, b.value);
         return result;
 
     } else if (!a.sign && !b.sign) {
         // add the values and set the sign to negative if both a and b are both negative
         Integer result;
         result.sign = false;
-        result.value = addup_raw_value(a.value, b.value);
+        result.value = Integer::addup_raw_value(a.value, b.value);
         return result;
 
     } else {
@@ -236,20 +244,20 @@ Integer operator+(Integer &a, Integer &b) {
         }
 
         // compare the values to decide what to do
-        int comparing_result = compare_raw_value(positive_integer->value, negative_integer->value);
+        int comparing_result = Integer::compare_raw_value(positive_integer->value, negative_integer->value);
 
         if (comparing_result > 0) {
             // the positive value is larger then the negative value
             Integer result;
             result.sign = true;
-            result.value = substractdown_raw_value(positive_integer->value, negative_integer->value);
+            result.value = Integer::substractdown_raw_value(positive_integer->value, negative_integer->value);
             result.arrange();
             return result;
         } else if (comparing_result < 0) {
             // the negative value is larger then the positive value
             Integer result;
             result.sign = false;
-            result.value = substractdown_raw_value(negative_integer->value, positive_integer->value);
+            result.value = Integer::substractdown_raw_value(negative_integer->value, positive_integer->value);
             result.arrange();
             return result;
         } else {
@@ -273,7 +281,7 @@ Integer operator-(Integer &a, Integer &b) {
 
 Integer operator*(Integer &a, Integer &b) {
     Integer result;
-    result.value = multiply_raw_value(a.value, b.value);
+    result.value = Integer::multiply_raw_value(a.value, b.value);
     result.sign = a.sign == b.sign;
     return result;
 }
@@ -283,7 +291,5 @@ Integer operator*(Integer &a, Integer &b) {
  */
 
 void Integer::arrange() {
-    while (value.size() > 1 && value.back() == 0) {
-        value.pop_back();
-    }
+    value = Integer::arrange_raw_value(value);
 }

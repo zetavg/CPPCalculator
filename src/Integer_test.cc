@@ -136,6 +136,8 @@ TEST(IntegerTest, MultiplicationOperator) {
     EXPECT_STREQ((e * f).get_value().c_str(), "-998001");
     Integer g = "-1", h = "-1";
     EXPECT_STREQ((g * h).get_value().c_str(), "1");
+    Integer i = "1", j = "10";
+    EXPECT_STREQ((i * j).get_value().c_str(), "10");
 }
 
 // Test operator * of Integer with big values
