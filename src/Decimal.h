@@ -5,10 +5,7 @@
 #include <iostream>
 #include <vector>
 
-#include "headers/NumberObject.h"
-
-typedef char decimal_digit_t;
-typedef std::vector<decimal_digit_t> decimal_value_t;
+#include "base/NumberObject.h"
 
 class Decimal : public NumberObject {
  public:
@@ -36,10 +33,6 @@ class Decimal : public NumberObject {
     /* Private methods */
     void arrange(); // Remove leading zeros from the value
     void simplify(); // Make fraction in lowest terms
- public:
-    /* Value calculation helpers */
-    static decimal_value_t raw_value_gcd(decimal_value_t &a, decimal_value_t &b);
-    static decimal_value_t raw_value_remainder(decimal_value_t &a, decimal_value_t &b);
 };
 
 #endif

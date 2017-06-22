@@ -8,8 +8,6 @@
 #include <algorithm>
 #include <climits>
 
-#include "Integer.h"
-
 #define DECIMAL_APPROXIMATE_DENOMINATOR_MAX_DIGITS 16
 
 /*
@@ -96,7 +94,7 @@ std::string Decimal::get_value() {
             approximate_denominator_lost_digits = denominator.size() + 1 - DECIMAL_APPROXIMATE_DENOMINATOR_MAX_DIGITS;
         }
         for (
-            decimal_value_t::iterator it = denominator.end() - 1;
+            number_value_t::iterator it = denominator.end() - 1;
             it >= denominator.begin() && denominator.end() - it < DECIMAL_APPROXIMATE_DENOMINATOR_MAX_DIGITS;
             --it
         ) {
@@ -119,7 +117,7 @@ std::string Decimal::get_value() {
 
         output_value_digits_after_decimal_point += approximate_denominator_lost_digits;
 
-        decimal_value_t output_value;
+        number_value_t output_value;
         int value_size = value.size();
         unsigned long long carry = 0;
         for (
@@ -131,7 +129,7 @@ std::string Decimal::get_value() {
             if (i < value_size) digit += value.at(i) * output_value_multiplier;
             carry = digit / 10;
             digit = digit % 10;
-            output_value.push_back((decimal_digit_t)digit);
+            output_value.push_back((number_digit_t)digit);
         }
 
         std::string str;
@@ -149,7 +147,7 @@ std::string Decimal::get_value() {
             }
         }
 
-        for (decimal_value_t::iterator it = output_value.end() - 1; it >= output_value.begin(); --it) {
+        for (number_value_t::iterator it = output_value.end() - 1; it >= output_value.begin(); --it) {
             if (output_value_digits_after_decimal_point == it - output_value.begin() + 1) {
                 str.push_back('.');
                 has_point = true;
@@ -174,16 +172,10 @@ std::string Decimal::get_value() {
 
 Decimal& Decimal::copy_value_from(const Decimal &reference) {
     sign = reference.sign;
-    value = decimal_value_t(reference.value);
-    denominator = decimal_value_t(reference.denominator);
+    value = number_value_t(reference.value);
+    denominator = number_value_t(reference.denominator);
     return *this;
 }
-
-/*
- * Value calculation helpers
- */
-
-// Currently none
 
 /*
  * Overload operators
@@ -214,17 +206,17 @@ std::istream& operator>>(std::istream &in, Decimal &decimal) {
 
 Decimal operator+(Decimal &a, Decimal &b) {
     // Make the denominator same
-    integer_value_t result_denominator = Integer::multiply_raw_value(a.denominator, b.denominator);
+    number_value_t result_denominator = Decimal::multiply_raw_value(a.denominator, b.denominator);
 
     // Calculate the values after multiplication
-    integer_value_t a_value_after_multiplication = Integer::multiply_raw_value(a.value, b.denominator);
-    integer_value_t b_value_after_multiplication = Integer::multiply_raw_value(b.value, a.denominator);
+    number_value_t a_value_after_multiplication = Decimal::multiply_raw_value(a.value, b.denominator);
+    number_value_t b_value_after_multiplication = Decimal::multiply_raw_value(b.value, a.denominator);
 
     if (a.sign && b.sign) {
         // simply add the values if both a and b are both positive
         Decimal result;
         result.sign = true;
-        result.value = Integer::addup_raw_value(a_value_after_multiplication, b_value_after_multiplication);
+        result.value = Decimal::addup_raw_value(a_value_after_multiplication, b_value_after_multiplication);
         result.denominator = result_denominator;
         return result;
 
@@ -232,13 +224,13 @@ Decimal operator+(Decimal &a, Decimal &b) {
         // add the values and set the sign to negative if both a and b are both negative
         Decimal result;
         result.sign = false;
-        result.value = Integer::addup_raw_value(a_value_after_multiplication, b_value_after_multiplication);
+        result.value = Decimal::addup_raw_value(a_value_after_multiplication, b_value_after_multiplication);
         result.denominator = result_denominator;
         return result;
 
     } else {
         // we need to compare the values and perform an substraction
-        integer_value_t positive_value_after_multiplication, negative_value_after_multiplication;
+        number_value_t positive_value_after_multiplication, negative_value_after_multiplication;
 
         // find the positive and negative decimal
         if (a.sign && !b.sign) {
@@ -250,13 +242,13 @@ Decimal operator+(Decimal &a, Decimal &b) {
         }
 
         // compare the values to decide what to do
-        int comparing_result = Integer::compare_raw_value(positive_value_after_multiplication, negative_value_after_multiplication);
+        int comparing_result = Decimal::compare_raw_value(positive_value_after_multiplication, negative_value_after_multiplication);
 
         if (comparing_result > 0) {
             // the positive value is larger then the negative value
             Decimal result;
             result.sign = true;
-            result.value = Integer::substractdown_raw_value(positive_value_after_multiplication, negative_value_after_multiplication);
+            result.value = Decimal::substractdown_raw_value(positive_value_after_multiplication, negative_value_after_multiplication);
             result.denominator = result_denominator;
             result.arrange();
             return result;
@@ -264,7 +256,7 @@ Decimal operator+(Decimal &a, Decimal &b) {
             // the negative value is larger then the positive value
             Decimal result;
             result.sign = false;
-            result.value = Integer::substractdown_raw_value(negative_value_after_multiplication, positive_value_after_multiplication);
+            result.value = Decimal::substractdown_raw_value(negative_value_after_multiplication, positive_value_after_multiplication);
             result.denominator = result_denominator;
             result.arrange();
             return result;
@@ -289,16 +281,16 @@ Decimal operator-(Decimal &a, Decimal &b) {
 
 Decimal operator*(Decimal &a, Decimal &b) {
     Decimal result;
-    result.value = Integer::multiply_raw_value(a.value, b.value);
-    result.denominator = Integer::multiply_raw_value(a.denominator, b.denominator);
+    result.value = Decimal::multiply_raw_value(a.value, b.value);
+    result.denominator = Decimal::multiply_raw_value(a.denominator, b.denominator);
     result.sign = a.sign == b.sign;
     return result;
 }
 
 Decimal operator/(Decimal &a, Decimal &b) {
     Decimal result;
-    result.value = Integer::multiply_raw_value(a.value, b.denominator);
-    result.denominator = Integer::multiply_raw_value(a.denominator, b.value);
+    result.value = Decimal::multiply_raw_value(a.value, b.denominator);
+    result.denominator = Decimal::multiply_raw_value(a.denominator, b.value);
     result.sign = a.sign == b.sign;
     result.arrange();
     return result;
@@ -309,6 +301,6 @@ Decimal operator/(Decimal &a, Decimal &b) {
  */
 
 void Decimal::arrange() {
-    value = Integer::arrange_raw_value(value);
-    denominator = Integer::arrange_raw_value(denominator);
+    value = Decimal::arrange_raw_value(value);
+    denominator = Decimal::arrange_raw_value(denominator);
 }

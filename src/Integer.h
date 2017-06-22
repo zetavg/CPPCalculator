@@ -5,10 +5,7 @@
 #include <iostream>
 #include <vector>
 
-#include "headers/NumberObject.h"
-
-typedef char integer_digit_t;
-typedef std::vector<integer_digit_t> integer_value_t;
+#include "base/NumberObject.h"
 
 class Integer : public NumberObject {
  public:
@@ -35,13 +32,6 @@ class Integer : public NumberObject {
  private:
     /* Private methods */
     void arrange(); // Remove leading zeros from the value
- public:
-    /* Value calculation helpers */
-    static integer_value_t addup_raw_value(integer_value_t &a, integer_value_t &b);
-    static integer_value_t substractdown_raw_value(integer_value_t &a, integer_value_t &b);
-    static integer_value_t multiply_raw_value(integer_value_t &a, integer_value_t &b);
-    static int compare_raw_value(integer_value_t &a, integer_value_t &b);
-    static integer_value_t arrange_raw_value(integer_value_t &v);
 };
 
 #endif

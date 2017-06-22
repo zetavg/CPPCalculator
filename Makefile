@@ -14,7 +14,9 @@ TESTS_DIR = ./tests
 # All tests produced by this Makefile.
 # Remember to add new tests you created to the list.
 TESTS = Integer_test Decimal_test
+INTERGRATION_TESTS = NumberObjects_test
 TEST_OBJ_FILES = $(shell echo "$(TESTS) " | sed 's/ /\.o /g')
+TEST_OBJ_FILES += $(shell echo " $(INTERGRATION_TESTS)." | sed 's/ /\.o i_/g' | sed 's/.$$/.o/g' | sed 's/^.o //g')
 TEST_TARGET_OBJ_FILES = $(shell echo "$(TESTS) " | sed 's/_test /\.o /g')
 
 # Points to the root of Google Test, relative to where this file is.
@@ -60,7 +62,8 @@ clean :
 
 # General rules.
 
-COMMON_HEADERS = $(SOURCE_DIR)/headers/*.h
+BASE_HEADERS = $(SOURCE_DIR)/base/*.h
+BASE_OBJ_FILES = $(shell ls $(SOURCE_DIR)/base/*.cpp | xargs | sed 's/.cpp/.o/g')
 
 %.o : $(SOURCE_DIR)/%.cpp $(SOURCE_DIR)/%.h $(COMMON_HEADERS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(COVERAGE_FLAGS_) -c $<
@@ -94,10 +97,13 @@ gtest_main.a : gtest-all.o gtest_main.o
 %_test.o : $(TESTS_DIR)/%_test.cpp $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $<
 
-%_test : %.o %_test.o gtest_main.a
+i_%_test.o : $(TESTS_DIR)/intergration/%_test.cpp $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+
+%_test : %.o %_test.o $(BASE_OBJ_FILES) gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
-all_tests : $(TEST_TARGET_OBJ_FILES) $(TEST_OBJ_FILES) gtest_main.a
+all_tests : $(BASE_OBJ_FILES) $(TEST_TARGET_OBJ_FILES) $(TEST_OBJ_FILES) gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(COVERAGE_FLAGS_) -lpthread $^ -o $@
 
 # Coverage report

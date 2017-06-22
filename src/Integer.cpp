@@ -59,7 +59,7 @@ std::string Integer::get_value() {
 
         if (!sign) str.push_back('-');
 
-        for (integer_value_t::iterator it = value.end() - 1; it >= value.begin(); --it) {
+        for (number_value_t::iterator it = value.end() - 1; it >= value.begin(); --it) {
             str.push_back(*it + 48);
         }
 
@@ -68,124 +68,9 @@ std::string Integer::get_value() {
 }
 
 Integer& Integer::copy_value_from(const NumberObject &reference) {
-    sign = reference.sign;
-    value = integer_value_t(reference.value);
+    sign = reference.get_raw_sign();
+    value = number_value_t(reference.get_raw_value());
     return *this;
-}
-
-/*
- * Value calculation helpers
- */
-
-// Adds up two integer_value_t, and return the sum
-integer_value_t Integer::addup_raw_value(integer_value_t &a, integer_value_t &b) {
-    integer_value_t result;
-    int a_size = a.size();
-    int b_size = b.size();
-    int max_size = std::max(a_size, b_size);
-
-
-    for (int i = 0, carry = 0; i < max_size || carry > 0; ++i) {
-        int digit = carry;
-        if (i < a_size) digit += a.at(i);
-        if (i < b_size) digit += b.at(i);
-        carry = digit / 10;
-        digit = digit % 10;
-        result.push_back(digit);
-    }
-
-    return result;
-}
-
-// Subtracts two integer_value_t (a - b), and return the remaining value
-//
-// The first value must be larger then the second one. It is the caller's
-// responsibility to ensure the inputs are valid, and to deal with the leading
-// zeros of the result.
-integer_value_t Integer::substractdown_raw_value(integer_value_t &a, integer_value_t &b) {
-    integer_value_t result;
-    int a_size = a.size();
-    int b_size = b.size();
-
-    for (int i = 0, carry = 0; i < a_size; ++i) {
-        int digit = a.at(i) + carry;
-        carry = 0;
-        if (i < b_size) digit -= b.at(i);
-        if (digit < 0) {
-            digit += 10;
-            carry = -1;
-        }
-        result.push_back(digit);
-    }
-
-    return result;
-}
-
-// Multiply two integer_value_t (a * b)
-integer_value_t Integer::multiply_raw_value(integer_value_t &a, integer_value_t &b) {
-    integer_value_t result;
-    int a_size = a.size();
-    int b_size = b.size();
-
-    for (int i = 0, carry = 0; i < a_size; ++i) {
-        for (int j = 0; j < b_size; ++j) {
-            unsigned long p = i + j;
-            integer_digit_t digit = a.at(i) * b.at(j) + carry;
-            if (result.size() > p) digit += result.at(p);
-            carry = digit / 10;
-            digit = digit % 10;
-            if (result.size() > p) {
-                result.at(p) = digit;
-            } else {
-                result.push_back(digit);
-            }
-        }
-
-        if (carry > 0) {
-            result.push_back(carry);
-            carry = 0;
-        }
-    }
-
-    return result;
-}
-
-// Compares two integer_value_t
-//
-// Returns 1 if the first one is larger then the second, -1 if smaller,
-// or 0 if same.
-int Integer::compare_raw_value(integer_value_t &a, integer_value_t &b) {
-    int a_size = a.size();
-    int b_size = b.size();
-
-    if (a_size > b_size) {
-        return 1;
-    } else if (b_size > a_size) {
-        return -1;
-    } else {
-        for (
-            integer_value_t::iterator a_i = a.end() - 1,
-                                      b_i = b.end() - 1;
-            a_i >= a.begin() && b_i >= b.begin();
-            --a_i, --b_i
-        ) {
-            if (*a_i > *b_i) {
-                return 1;
-            } else if (*b_i > *a_i) {
-                return -1;
-            }
-        }
-
-        return 0;
-    }
-}
-
-integer_value_t Integer::arrange_raw_value(integer_value_t &v) {
-    while (v.size() > 1 && v.back() == 0) {
-        v.pop_back();
-    }
-
-    return v;
 }
 
 /*
@@ -291,5 +176,5 @@ Integer operator*(Integer &a, Integer &b) {
  */
 
 void Integer::arrange() {
-    value = Integer::arrange_raw_value(value);
+    value = arrange_raw_value(value);
 }
