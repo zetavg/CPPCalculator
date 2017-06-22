@@ -67,7 +67,7 @@ std::string Integer::get_value() {
     }
 }
 
-Integer& Integer::copy_value_from(const Integer &reference) {
+Integer& Integer::copy_value_from(const NumberObject &reference) {
     sign = reference.sign;
     value = integer_value_t(reference.value);
     return *this;

@@ -8,6 +8,9 @@
 # Location of the source code.
 SOURCE_DIR = ./src
 
+# Location of the tests.
+TESTS_DIR = ./tests
+
 # All tests produced by this Makefile.
 # Remember to add new tests you created to the list.
 TESTS = Integer_test Decimal_test
@@ -57,7 +60,9 @@ clean :
 
 # General rules.
 
-%.o : $(SOURCE_DIR)/%.cc $(SOURCE_DIR)/%.h $(GTEST_HEADERS)
+COMMON_HEADERS = $(SOURCE_DIR)/headers/*.h
+
+%.o : $(SOURCE_DIR)/%.cpp $(SOURCE_DIR)/%.h $(COMMON_HEADERS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(COVERAGE_FLAGS_) -c $<
 
 # Builds gtest.a and gtest_main.a.
@@ -86,8 +91,7 @@ gtest_main.a : gtest-all.o gtest_main.o
 
 # Build tests.
 
-%_test.o : $(SOURCE_DIR)/%_test.cc \
-               $(SOURCE_DIR)/%.h $(GTEST_HEADERS)
+%_test.o : $(TESTS_DIR)/%_test.cpp $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $<
 
 %_test : %.o %_test.o gtest_main.a

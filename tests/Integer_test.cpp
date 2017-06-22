@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "Integer.h"
+#include "../src/Integer.h"
 
 #include <iostream>
 

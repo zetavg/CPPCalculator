@@ -5,10 +5,12 @@
 #include <iostream>
 #include <vector>
 
+#include "headers/NumberObject.h"
+
 typedef char integer_digit_t;
 typedef std::vector<integer_digit_t> integer_value_t;
 
-class Integer {
+class Integer : public NumberObject {
  public:
     /* Constructors */
     Integer();
@@ -17,7 +19,7 @@ class Integer {
     /* Getter and setters */
     Integer& set_value(const char*);
     std::string get_value();
-    Integer& copy_value_from(const Integer &);
+    Integer& copy_value_from(const NumberObject &);
     /* Overload operators */
     Integer& operator=(const char*);
     Integer& operator=(const Integer &);
@@ -31,9 +33,6 @@ class Integer {
     friend bool operator>(Integer &a, Integer &b);
     // friend Integer operator/(Integer &a, Integer &b);
  private:
-    /* Private members */
-    bool sign;
-    integer_value_t value;
     /* Private methods */
     void arrange(); // Remove leading zeros from the value
  public:

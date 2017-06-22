@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "Decimal.h"
+#include "../src/Decimal.h"
 
 #include <iostream>
 
@@ -24,7 +24,7 @@ TEST(DecimalTest, Constructor) {
     Decimal decimal_7 = "1/5";
     EXPECT_STREQ(decimal_7.get_value().c_str(), "0.2");
     Decimal decimal_8 = "1/104729";
-    EXPECT_STREQ(decimal_8.get_value().c_str(), "0.0000095484536279349552");
+    EXPECT_STREQ(decimal_8.get_value().c_str(), "0.0000095484");
     Decimal decimal_9 = "0";
     Decimal decimal_10 = decimal_9;
     decimal_9 = "1";

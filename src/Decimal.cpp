@@ -6,7 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
- #include <climits>
+#include <climits>
 
 #include "Integer.h"
 
@@ -35,7 +35,7 @@ Decimal::Decimal(const Decimal &decimal) {
 
 Decimal& Decimal::set_value(const char *number) {
     sign = true;
-    molecular.clear();
+    value.clear();
     denominator.clear();
 
     if (strcmp(number, "null") != 0) {
@@ -54,15 +54,15 @@ Decimal& Decimal::set_value(const char *number) {
             }
             if (number[i] == '/') {
                 state = 2;
-                molecular.swap(denominator);
-                molecular.clear();
+                value.swap(denominator);
+                value.clear();
                 continue;
             }
 
             int n = number[i] - 48;
             if (n < 0 && n > 9) continue;
 
-            molecular.push_back(n);
+            value.push_back(n);
 
             if (state == 0) {
                 denominator.push_back(0);
@@ -83,9 +83,9 @@ Decimal& Decimal::set_value(const char *number) {
 }
 
 std::string Decimal::get_value() {
-    if (molecular.empty()) {
+    if (value.empty()) {
         return "null";
-    } else if (molecular.size() == 1 && molecular.at(0) == 0) {
+    } else if (value.size() == 1 && value.at(0) == 0) {
         return "0";
     } else {
         unsigned long long approximate_denominator = 0;
@@ -120,15 +120,15 @@ std::string Decimal::get_value() {
         output_value_digits_after_decimal_point += approximate_denominator_lost_digits;
 
         decimal_value_t output_value;
-        int molecular_size = molecular.size();
+        int value_size = value.size();
         unsigned long long carry = 0;
         for (
             int i = 0;
-            i < molecular_size || carry != 0;
+            i < value_size || carry != 0;
             ++i
         ) {
             unsigned long long digit = carry;
-            if (i < molecular_size) digit += molecular.at(i) * output_value_multiplier;
+            if (i < value_size) digit += value.at(i) * output_value_multiplier;
             carry = digit / 10;
             digit = digit % 10;
             output_value.push_back((decimal_digit_t)digit);
@@ -174,7 +174,7 @@ std::string Decimal::get_value() {
 
 Decimal& Decimal::copy_value_from(const Decimal &reference) {
     sign = reference.sign;
-    molecular = decimal_value_t(reference.molecular);
+    value = decimal_value_t(reference.value);
     denominator = decimal_value_t(reference.denominator);
     return *this;
 }
@@ -217,14 +217,14 @@ Decimal operator+(Decimal &a, Decimal &b) {
     integer_value_t result_denominator = Integer::multiply_raw_value(a.denominator, b.denominator);
 
     // Calculate the values after multiplication
-    integer_value_t a_molecular_after_multiplication = Integer::multiply_raw_value(a.molecular, b.denominator);
-    integer_value_t b_molecular_after_multiplication = Integer::multiply_raw_value(b.molecular, a.denominator);
+    integer_value_t a_value_after_multiplication = Integer::multiply_raw_value(a.value, b.denominator);
+    integer_value_t b_value_after_multiplication = Integer::multiply_raw_value(b.value, a.denominator);
 
     if (a.sign && b.sign) {
         // simply add the values if both a and b are both positive
         Decimal result;
         result.sign = true;
-        result.molecular = Integer::addup_raw_value(a_molecular_after_multiplication, b_molecular_after_multiplication);
+        result.value = Integer::addup_raw_value(a_value_after_multiplication, b_value_after_multiplication);
         result.denominator = result_denominator;
         return result;
 
@@ -232,31 +232,31 @@ Decimal operator+(Decimal &a, Decimal &b) {
         // add the values and set the sign to negative if both a and b are both negative
         Decimal result;
         result.sign = false;
-        result.molecular = Integer::addup_raw_value(a_molecular_after_multiplication, b_molecular_after_multiplication);
+        result.value = Integer::addup_raw_value(a_value_after_multiplication, b_value_after_multiplication);
         result.denominator = result_denominator;
         return result;
 
     } else {
         // we need to compare the values and perform an substraction
-        integer_value_t positive_molecular_after_multiplication, negative_molecular_after_multiplication;
+        integer_value_t positive_value_after_multiplication, negative_value_after_multiplication;
 
         // find the positive and negative decimal
         if (a.sign && !b.sign) {
-            positive_molecular_after_multiplication = a_molecular_after_multiplication;
-            negative_molecular_after_multiplication = b_molecular_after_multiplication;
+            positive_value_after_multiplication = a_value_after_multiplication;
+            negative_value_after_multiplication = b_value_after_multiplication;
         } else {
-            positive_molecular_after_multiplication = b_molecular_after_multiplication;
-            negative_molecular_after_multiplication = a_molecular_after_multiplication;
+            positive_value_after_multiplication = b_value_after_multiplication;
+            negative_value_after_multiplication = a_value_after_multiplication;
         }
 
         // compare the values to decide what to do
-        int comparing_result = Integer::compare_raw_value(positive_molecular_after_multiplication, negative_molecular_after_multiplication);
+        int comparing_result = Integer::compare_raw_value(positive_value_after_multiplication, negative_value_after_multiplication);
 
         if (comparing_result > 0) {
             // the positive value is larger then the negative value
             Decimal result;
             result.sign = true;
-            result.molecular = Integer::substractdown_raw_value(positive_molecular_after_multiplication, negative_molecular_after_multiplication);
+            result.value = Integer::substractdown_raw_value(positive_value_after_multiplication, negative_value_after_multiplication);
             result.denominator = result_denominator;
             result.arrange();
             return result;
@@ -264,7 +264,7 @@ Decimal operator+(Decimal &a, Decimal &b) {
             // the negative value is larger then the positive value
             Decimal result;
             result.sign = false;
-            result.molecular = Integer::substractdown_raw_value(negative_molecular_after_multiplication, positive_molecular_after_multiplication);
+            result.value = Integer::substractdown_raw_value(negative_value_after_multiplication, positive_value_after_multiplication);
             result.denominator = result_denominator;
             result.arrange();
             return result;
@@ -289,7 +289,7 @@ Decimal operator-(Decimal &a, Decimal &b) {
 
 Decimal operator*(Decimal &a, Decimal &b) {
     Decimal result;
-    result.molecular = Integer::multiply_raw_value(a.molecular, b.molecular);
+    result.value = Integer::multiply_raw_value(a.value, b.value);
     result.denominator = Integer::multiply_raw_value(a.denominator, b.denominator);
     result.sign = a.sign == b.sign;
     return result;
@@ -297,8 +297,8 @@ Decimal operator*(Decimal &a, Decimal &b) {
 
 Decimal operator/(Decimal &a, Decimal &b) {
     Decimal result;
-    result.molecular = Integer::multiply_raw_value(a.molecular, b.denominator);
-    result.denominator = Integer::multiply_raw_value(a.denominator, b.molecular);
+    result.value = Integer::multiply_raw_value(a.value, b.denominator);
+    result.denominator = Integer::multiply_raw_value(a.denominator, b.value);
     result.sign = a.sign == b.sign;
     result.arrange();
     return result;
@@ -309,6 +309,6 @@ Decimal operator/(Decimal &a, Decimal &b) {
  */
 
 void Decimal::arrange() {
-    molecular = Integer::arrange_raw_value(molecular);
+    value = Integer::arrange_raw_value(value);
     denominator = Integer::arrange_raw_value(denominator);
 }

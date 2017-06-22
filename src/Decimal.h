@@ -5,10 +5,12 @@
 #include <iostream>
 #include <vector>
 
+#include "headers/NumberObject.h"
+
 typedef char decimal_digit_t;
 typedef std::vector<decimal_digit_t> decimal_value_t;
 
-class Decimal {
+class Decimal : public NumberObject {
  public:
     /* Constructors */
     Decimal();
@@ -31,9 +33,6 @@ class Decimal {
     friend bool operator>(Decimal &a, Decimal &b);
     friend Decimal operator/(Decimal &a, Decimal &b);
  private:
-    /* Private members */
-    bool sign;
-    decimal_value_t molecular, denominator;
     /* Private methods */
     void arrange(); // Remove leading zeros from the value
     void simplify(); // Make fraction in lowest terms
