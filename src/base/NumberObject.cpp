@@ -5,7 +5,7 @@
  */
 
 // Adds up two number_value_t, and return the sum
-number_value_t NumberObject::addup_raw_value(number_value_t &a, number_value_t &b) {
+number_value_t NumberObject::addup_raw_value(const number_value_t &a, const number_value_t &b) {
     number_value_t result;
     int a_size = a.size();
     int b_size = b.size();
@@ -28,7 +28,7 @@ number_value_t NumberObject::addup_raw_value(number_value_t &a, number_value_t &
 // The first value must be larger then the second one. It is the caller's
 // responsibility to ensure the inputs are valid, and to deal with the leading
 // zeros of the result.
-number_value_t NumberObject::substractdown_raw_value(number_value_t &a, number_value_t &b) {
+number_value_t NumberObject::substractdown_raw_value(const number_value_t &a, const number_value_t &b) {
     number_value_t result;
     int a_size = a.size();
     int b_size = b.size();
@@ -44,11 +44,30 @@ number_value_t NumberObject::substractdown_raw_value(number_value_t &a, number_v
         result.push_back(digit);
     }
 
+    arrange_raw_value(result);
+
     return result;
 }
 
+// Adds an integer to a raw value
+number_value_t NumberObject::raw_value_plus(number_value_t &v, int amount) {
+    int carry = amount;
+
+    for (number_value_t::iterator it = v.begin(); it != v.end(); ++it) {
+        *it += carry;
+        carry = 0;
+        if (*it < 10) break;
+        carry = *it / 10;
+        *it %= 10;
+    }
+
+    if (carry > 0) v.push_back(carry);
+
+    return v;
+}
+
 // Multiply two number_value_t (a * b)
-number_value_t NumberObject::multiply_raw_value(number_value_t &a, number_value_t &b) {
+number_value_t NumberObject::multiply_raw_value(const number_value_t &a, const number_value_t &b) {
     number_value_t result;
     int a_size = a.size();
     int b_size = b.size();
@@ -80,7 +99,7 @@ number_value_t NumberObject::multiply_raw_value(number_value_t &a, number_value_
 //
 // Returns 1 if the first one is larger then the second, -1 if smaller,
 // or 0 if same.
-int NumberObject::compare_raw_value(number_value_t &a, number_value_t &b) {
+int NumberObject::compare_raw_value(const number_value_t &a, const number_value_t &b) {
     int a_size = a.size();
     int b_size = b.size();
 
@@ -90,8 +109,8 @@ int NumberObject::compare_raw_value(number_value_t &a, number_value_t &b) {
         return -1;
     } else {
         for (
-            number_value_t::iterator a_i = a.end() - 1,
-                                      b_i = b.end() - 1;
+            number_value_t::const_iterator a_i = a.end() - 1,
+                                           b_i = b.end() - 1;
             a_i >= a.begin() && b_i >= b.begin();
             --a_i, --b_i
         ) {
@@ -112,4 +131,13 @@ number_value_t NumberObject::arrange_raw_value(number_value_t &v) {
     }
 
     return v;
+}
+
+std::string NumberObject::print_raw_value_to_string(number_value_t &v, std::string &str) {
+    if (v.empty()) return str;
+    for (number_value_t::iterator it = v.end() - 1; it >= v.begin(); --it) {
+        str.push_back(*it + 48);
+    }
+
+    return str;
 }

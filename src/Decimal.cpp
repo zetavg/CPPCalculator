@@ -22,7 +22,6 @@ Decimal::Decimal(const char *number) {
     set_value(number);
 }
 
-
 Decimal::Decimal(const Decimal &decimal) {
     copy_value_from(decimal);
 }
@@ -84,87 +83,45 @@ std::string Decimal::get_value() {
     if (value.empty()) {
         return "null";
     } else if (value.size() == 1 && value.at(0) == 0) {
-        return "0";
+        return "0.0";
+    } else if (denominator.size() == 1 && denominator.at(0) == 1) {
+        std::string str;
+        if (!sign) str.push_back('-');
+        print_raw_value_to_string(value, str);
+        str.push_back('.');
+        str.push_back('0');
+        return str;
     } else {
-        unsigned long long approximate_denominator = 0;
-        unsigned long long approximate_denominator_lost_digits;
-        if (denominator.size() < DECIMAL_APPROXIMATE_DENOMINATOR_MAX_DIGITS) {
-            approximate_denominator_lost_digits = 0;
-        } else {
-            approximate_denominator_lost_digits = denominator.size() + 1 - DECIMAL_APPROXIMATE_DENOMINATOR_MAX_DIGITS;
-        }
-        for (
-            number_value_t::iterator it = denominator.end() - 1;
-            it >= denominator.begin() && denominator.end() - it < DECIMAL_APPROXIMATE_DENOMINATOR_MAX_DIGITS;
-            --it
-        ) {
-            approximate_denominator *= (unsigned long long)10;
-            approximate_denominator += (unsigned long long)*it;
+        // calculate the value in decimal format
+        number_value_t molecular(value);
+        number_value_t result_integer_part, result_decimal_part;
+        result_integer_part.push_back(0);
+
+        while (compare_raw_value(molecular, denominator) >= 0) {
+            molecular = substractdown_raw_value(molecular, denominator);
+            raw_value_plus(result_integer_part, 1);
         }
 
-        if (approximate_denominator == 0) approximate_denominator = 1;
-
-        unsigned long long output_value_digits_after_decimal_point = 0;
-        unsigned long long output_value_multiplier = 1;
-        unsigned long long output_value_multiplier_max = ULLONG_MAX / 1000;
-        while (
-            (long long)std::pow(10, output_value_digits_after_decimal_point) % approximate_denominator > 0 &&
-            output_value_multiplier < output_value_multiplier_max
-        ) {
-            ++output_value_digits_after_decimal_point;
-            output_value_multiplier = std::pow(10, output_value_digits_after_decimal_point) / approximate_denominator;
+        for (int i = 0; i < 100; ++i) {
+            if (molecular.size() == 1 && molecular.at(0) == 0) break;
+            molecular.insert(molecular.begin(), 0);
+            int d = 0;
+            while (compare_raw_value(molecular, denominator) >= 0) {
+                molecular = substractdown_raw_value(molecular, denominator);
+                ++d;
+            }
+            result_decimal_part.push_back(d);
         }
 
-        output_value_digits_after_decimal_point += approximate_denominator_lost_digits;
-
-        number_value_t output_value;
-        int value_size = value.size();
-        unsigned long long carry = 0;
-        for (
-            int i = 0;
-            i < value_size || carry != 0;
-            ++i
-        ) {
-            unsigned long long digit = carry;
-            if (i < value_size) digit += value.at(i) * output_value_multiplier;
-            carry = digit / 10;
-            digit = digit % 10;
-            output_value.push_back((number_digit_t)digit);
-        }
+        result_decimal_part.push_back(0);
+        arrange_raw_value(result_decimal_part);
+        std::reverse(result_decimal_part.begin(), result_decimal_part.end());
 
         std::string str;
-
-        bool has_point = false;
-
         if (!sign) str.push_back('-');
-
-        if (output_value_digits_after_decimal_point >= output_value.size()) {
-            str.push_back('0');
-            if (output_value_digits_after_decimal_point > output_value.size()) {
-                str.push_back('.');
-                has_point = true;
-                for (int i = 0; i < output_value_digits_after_decimal_point - output_value.size(); ++i) str.push_back('0');
-            }
-        }
-
-        for (number_value_t::iterator it = output_value.end() - 1; it >= output_value.begin(); --it) {
-            if (output_value_digits_after_decimal_point == it - output_value.begin() + 1) {
-                str.push_back('.');
-                has_point = true;
-            }
-            str.push_back(*it + 48);
-        }
-
-        if (has_point) for (std::string::iterator it = str.end() - 1; it >= str.begin(); --it) {
-            if (*it == '0') {
-                *it = '\0';
-            } else if (*it == '.') {
-                *it = '\0';
-                break;
-            } else {
-                break;
-            }
-        }
+        print_raw_value_to_string(result_integer_part, str);
+        str.push_back('.');
+        print_raw_value_to_string(result_decimal_part, str);
 
         return str;
     }

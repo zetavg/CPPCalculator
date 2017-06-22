@@ -101,6 +101,7 @@ TEST(IntegerTest, SubtractionOperator) {
     EXPECT_STREQ((-a).get_value().c_str(), "-65535");
     EXPECT_STREQ(a.get_value().c_str(), "65535");
     EXPECT_STREQ((a - b).get_value().c_str(), "1337");
+    EXPECT_STREQ((a - a).get_value().c_str(), "0");
 }
 
 // Test operator - of Integer with big values

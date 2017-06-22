@@ -59,9 +59,7 @@ std::string Integer::get_value() {
 
         if (!sign) str.push_back('-');
 
-        for (number_value_t::iterator it = value.end() - 1; it >= value.begin(); --it) {
-            str.push_back(*it + 48);
-        }
+        print_raw_value_to_string(value, str);
 
         return str;
     }

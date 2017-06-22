@@ -36,13 +36,15 @@ class NumberObject {
     number_value_t denominator;
  public:
     /* Value calculation helpers */
-    static number_value_t addup_raw_value(number_value_t &a, number_value_t &b);
-    static number_value_t substractdown_raw_value(number_value_t &a, number_value_t &b);
-    static number_value_t multiply_raw_value(number_value_t &a, number_value_t &b);
-    static int compare_raw_value(number_value_t &a, number_value_t &b);
+    static number_value_t addup_raw_value(const number_value_t &a, const number_value_t &b);
+    static number_value_t substractdown_raw_value(const number_value_t &a, const number_value_t &b);
+    static number_value_t raw_value_plus(number_value_t &v, int amount);
+    static number_value_t multiply_raw_value(const number_value_t &a, const number_value_t &b);
+    static int compare_raw_value(const number_value_t &a, const number_value_t &b);
     static number_value_t arrange_raw_value(number_value_t &v);
     static number_value_t raw_value_gcd(number_value_t &a, number_value_t &b);
     static number_value_t raw_value_remainder(number_value_t &a, number_value_t &b);
+    static std::string print_raw_value_to_string(number_value_t &v, std::string &str);
 };
 
 #endif
