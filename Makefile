@@ -60,10 +60,15 @@ coverage : test cov.info
 clean :
 	rm -rf $(TESTS) gtest.a gtest_main.a *.o *_test *_tests *.gcda *.gcno *.gcov cov.info coverage
 
-# General rules.
+# Rules.
 
 BASE_HEADERS = $(SOURCE_DIR)/base/*.h
-BASE_OBJ_FILES = $(shell ls $(SOURCE_DIR)/base/*.cpp | xargs | sed 's/.cpp/.o/g')
+BASE_OBJ_FILES = $(shell ls $(SOURCE_DIR)/base/*.cpp | xargs -n 1 basename | xargs | sed 's/.cpp/.o/g')
+
+$(BASE_OBJ_FILES) : %.o : $(SOURCE_DIR)/base/%.cpp $(SOURCE_DIR)/base/%.h $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(COVERAGE_FLAGS_) -c $<
+
+# General rules.
 
 %.o : $(SOURCE_DIR)/%.cpp $(SOURCE_DIR)/%.h $(COMMON_HEADERS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(COVERAGE_FLAGS_) -c $<
