@@ -148,7 +148,7 @@ Decimal& Decimal::operator=(const Decimal &decimal) {
     return *this;
 }
 
-std::ostream& operator<<(std::ostream &out, Decimal &decimal) {
+std::ostream& operator<<(std::ostream &out, Decimal decimal) {
     out << decimal.get_value();
     return out;
 }
@@ -251,6 +251,44 @@ Decimal operator/(Decimal &a, Decimal &b) {
     result.sign = a.sign == b.sign;
     result.arrange();
     return result;
+}
+
+Decimal operator+(Decimal &a, Integer &b) {
+    Decimal db = b.get_value().c_str();
+    return a + db;
+}
+Decimal operator-(Decimal &a, Integer &b) {
+    Decimal db = b.get_value().c_str();
+    return a + db;
+}
+Decimal operator*(Decimal &a, Integer &b) {
+    Decimal db = b.get_value().c_str();
+    return a + db;
+}
+Decimal operator/(Decimal &a, Integer &b) {
+    Decimal db = b.get_value().c_str();
+    return a + db;
+}
+Decimal operator+(Integer &a, Decimal &b) {
+    Decimal da = a.get_value().c_str();
+    return da + b;
+}
+Decimal operator-(Integer &a, Decimal &b) {
+    Decimal da = a.get_value().c_str();
+    return da + b;
+}
+Decimal operator*(Integer &a, Decimal &b) {
+    Decimal da = a.get_value().c_str();
+    return da + b;
+}
+Decimal operator/(Integer &a, Decimal &b) {
+    Decimal da = a.get_value().c_str();
+    return da + b;
+}
+Decimal operator/(Integer &a, Integer &b) {
+    Decimal db = a.get_value().c_str();
+    Decimal da = a.get_value().c_str();
+    return da + db;
 }
 
 /*

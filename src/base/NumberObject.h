@@ -29,11 +29,16 @@ class NumberObject {
     bool get_raw_sign() const { return sign; }
     number_value_t get_raw_value() const { return value; }
     number_value_t get_raw_denominator() const { return denominator; }
+    number_value_t get_raw_i_value() const { return i_value; }
+    number_value_t get_raw_i_denominator() const { return i_denominator; }
  protected:
     /* Private members */
     bool sign;
     number_value_t value;
     number_value_t denominator;
+    bool i_sign;
+    number_value_t i_value;
+    number_value_t i_denominator;
  public:
     /* Value calculation helpers */
     static number_value_t addup_raw_value(const number_value_t &a, const number_value_t &b);

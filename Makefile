@@ -13,7 +13,7 @@ TESTS_DIR = ./tests
 
 # All tests produced by this Makefile.
 # Remember to add new tests you created to the list.
-TESTS = Integer_test Decimal_test
+TESTS = Integer_test Decimal_test Complex_test
 INTERGRATION_TESTS = NumberObjects_test
 TEST_OBJ_FILES = $(shell echo "$(TESTS) " | sed 's/ /\.o /g')
 TEST_OBJ_FILES += $(shell echo " $(INTERGRATION_TESTS)." | sed 's/ /\.o i_/g' | sed 's/.$$/.o/g' | sed 's/^.o //g')

@@ -85,7 +85,7 @@ Integer& Integer::operator=(const Integer &integer) {
     return *this;
 }
 
-std::ostream& operator<<(std::ostream &out, Integer &integer) {
+std::ostream& operator<<(std::ostream &out, Integer integer) {
     out << integer.get_value();
     return out;
 }
