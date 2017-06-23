@@ -77,3 +77,23 @@ TEST(NumberObjectsTest, Calculation) {
     output_ss_2 << d + c;
     EXPECT_STREQ(output_ss_2.str().c_str(), "444.444+321.321i");
 }
+
+TEST(NumberObjectsTest, Demo) {
+    using namespace std;
+
+    Integer a = "9999";
+    Decimal b = "-333";
+    Complex c = "0-1i";
+
+    cout << a + b + c << endl;
+
+    a = "-5";
+    b = "3.3";
+    c = "0-1i";
+    cout << -a - b - c << endl;
+
+    a = "100";
+    b = "0.01";
+    c = "0-1i";
+    cout << a * c - b << endl;
+}

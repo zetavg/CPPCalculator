@@ -98,7 +98,7 @@ std::istream& operator>>(std::istream &in, Integer &integer) {
     return in;
 }
 
-Integer operator+(Integer &a, Integer &b) {
+Integer operator+(Integer a, Integer b) {
     if (a.sign && b.sign) {
         // simply add the values if both a and b are both positive
         Integer result;
@@ -157,12 +157,12 @@ Integer operator-(Integer &integer) {
     return result;
 }
 
-Integer operator-(Integer &a, Integer &b) {
+Integer operator-(Integer a, Integer b) {
     Integer negative_b = -b;
     return (a + negative_b);
 }
 
-Integer operator*(Integer &a, Integer &b) {
+Integer operator*(Integer a, Integer b) {
     Integer result;
     result.value = Integer::multiply_raw_value(a.value, b.value);
     result.sign = a.sign == b.sign;

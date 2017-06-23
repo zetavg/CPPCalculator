@@ -40,8 +40,12 @@ Complex& Complex::set_value(const char *number) {
 
     if (strcmp(number, "null") != 0) {
         int last, i_last;
-        for (last = 0; number[last] != '\0' && number[last] != '+'; ++last) continue;
-        for (i_last = last; number[i_last] != '\0' && number[i_last] != 'i'; ++i_last) continue;
+        for (i_last = 0; number[i_last] != '\0' && number[i_last] != 'i'; ++i_last) continue;
+        if (number[i_last] == 'i') {
+            for (last = 1; number[last] != '+' && number[last] != '-'; ++last) continue;
+        } else {
+            for (last = 1; number[last] != '\0'; ++last) continue;
+        }
         int state = 0, i_state = 0;
 
         for (int i = last - 1; i >= 0; --i) {
@@ -78,6 +82,10 @@ Complex& Complex::set_value(const char *number) {
         }
 
         // i part
+
+        if (number[last] == '-') {
+            i_sign = false;
+        }
 
         for (int i = i_last - 1; i > last; --i) {
             if (number[i] == '-') {
@@ -257,7 +265,7 @@ std::istream& operator>>(std::istream &in, Complex &complex) {
     return in;
 }
 
-Complex operator+(Complex &a, Complex &b) {
+Complex operator+(Complex a, Complex b) {
     Complex result;
 
     // Make the denominator same
@@ -380,12 +388,12 @@ Complex operator-(Complex &complex) {
     return result;
 }
 
-Complex operator-(Complex &a, Complex &b) {
+Complex operator-(Complex a, Complex b) {
     Complex negative_b = -b;
     return (a + negative_b);
 }
 
-Complex operator*(Complex &a, Complex &b) {
+Complex operator*(Complex a, Complex b) {
     Complex result;
     result.value = Complex::multiply_raw_value(a.value, b.value);
     result.denominator = Complex::multiply_raw_value(a.denominator, b.denominator);
@@ -396,7 +404,7 @@ Complex operator*(Complex &a, Complex &b) {
     return result;
 }
 
-Complex operator/(Complex &a, Complex &b) {
+Complex operator/(Complex a, Complex b) {
     Complex result;
     result.value = Complex::multiply_raw_value(a.value, b.denominator);
     result.denominator = Complex::multiply_raw_value(a.denominator, b.value);
@@ -408,68 +416,68 @@ Complex operator/(Complex &a, Complex &b) {
     return result;
 }
 
-Complex operator+(Complex &a, Integer &b) {
+Complex operator+(Complex a, Integer b) {
     Complex cb = b.get_value().c_str();
     return a + cb;
 }
-Complex operator-(Complex &a, Integer &b) {
+Complex operator-(Complex a, Integer b) {
+    Complex cb = b.get_value().c_str();
+    return a - cb;
+}
+Complex operator*(Complex a, Integer b) {
     Complex cb = b.get_value().c_str();
     return a + cb;
 }
-Complex operator*(Complex &a, Integer &b) {
+Complex operator/(Complex a, Integer b) {
     Complex cb = b.get_value().c_str();
     return a + cb;
 }
-Complex operator/(Complex &a, Integer &b) {
-    Complex cb = b.get_value().c_str();
-    return a + cb;
-}
-Complex operator+(Integer &a, Complex &b) {
+Complex operator+(Integer a, Complex b) {
     Complex ca = a.get_value().c_str();
     return ca + b;
 }
-Complex operator-(Integer &a, Complex &b) {
+Complex operator-(Integer a, Complex b) {
+    Complex ca = a.get_value().c_str();
+    return ca - b;
+}
+Complex operator*(Integer a, Complex b) {
     Complex ca = a.get_value().c_str();
     return ca + b;
 }
-Complex operator*(Integer &a, Complex &b) {
-    Complex ca = a.get_value().c_str();
-    return ca + b;
-}
-Complex operator/(Integer &a, Complex &b) {
+Complex operator/(Integer a, Complex b) {
     Complex ca = a.get_value().c_str();
     return ca + b;
 }
 
-Complex operator+(Complex &a, Decimal &b) {
+Complex operator+(Complex a, Decimal b) {
     Complex cb = b.get_value().c_str();
     return a + cb;
 }
-Complex operator-(Complex &a, Decimal &b) {
+Complex operator-(Complex a, Decimal b) {
+    Complex cb = b.get_value().c_str();
+    return a - cb;
+}
+Complex operator*(Complex a, Decimal b) {
     Complex cb = b.get_value().c_str();
     return a + cb;
 }
-Complex operator*(Complex &a, Decimal &b) {
+Complex operator/(Complex a, Decimal b) {
     Complex cb = b.get_value().c_str();
     return a + cb;
 }
-Complex operator/(Complex &a, Decimal &b) {
-    Complex cb = b.get_value().c_str();
-    return a + cb;
-}
-Complex operator+(Decimal &a, Complex &b) {
+Complex operator+(Decimal a, Complex b) {
     Complex ca = a.get_value().c_str();
     return ca + b;
 }
-Complex operator-(Decimal &a, Complex &b) {
+Complex operator-(Decimal a, Complex b) {
+    Complex ca = a.get_value().c_str();
+    return ca -  b;
+}
+Complex operator*(Decimal a, Complex b) {
     Complex ca = a.get_value().c_str();
     return ca + b;
 }
-Complex operator*(Decimal &a, Complex &b) {
-    Complex ca = a.get_value().c_str();
-    return ca + b;
-}
-Complex operator/(Decimal &a, Complex &b) {
+Complex operator/(Decimal a, Complex b) {
     Complex ca = a.get_value().c_str();
     return ca + b;
 }

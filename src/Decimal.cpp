@@ -161,7 +161,7 @@ std::istream& operator>>(std::istream &in, Decimal &decimal) {
     return in;
 }
 
-Decimal operator+(Decimal &a, Decimal &b) {
+Decimal operator+(Decimal a, Decimal b) {
     // Make the denominator same
     number_value_t result_denominator = Decimal::multiply_raw_value(a.denominator, b.denominator);
 
@@ -231,12 +231,12 @@ Decimal operator-(Decimal &decimal) {
     return result;
 }
 
-Decimal operator-(Decimal &a, Decimal &b) {
+Decimal operator-(Decimal a, Decimal b) {
     Decimal negative_b = -b;
     return (a + negative_b);
 }
 
-Decimal operator*(Decimal &a, Decimal &b) {
+Decimal operator*(Decimal a, Decimal b) {
     Decimal result;
     result.value = Decimal::multiply_raw_value(a.value, b.value);
     result.denominator = Decimal::multiply_raw_value(a.denominator, b.denominator);
@@ -244,7 +244,7 @@ Decimal operator*(Decimal &a, Decimal &b) {
     return result;
 }
 
-Decimal operator/(Decimal &a, Decimal &b) {
+Decimal operator/(Decimal a, Decimal b) {
     Decimal result;
     result.value = Decimal::multiply_raw_value(a.value, b.denominator);
     result.denominator = Decimal::multiply_raw_value(a.denominator, b.value);
@@ -253,42 +253,42 @@ Decimal operator/(Decimal &a, Decimal &b) {
     return result;
 }
 
-Decimal operator+(Decimal &a, Integer &b) {
+Decimal operator+(Decimal a, Integer b) {
     Decimal db = b.get_value().c_str();
     return a + db;
 }
-Decimal operator-(Decimal &a, Integer &b) {
+Decimal operator-(Decimal a, Integer b) {
     Decimal db = b.get_value().c_str();
-    return a + db;
+    return a - db;
 }
-Decimal operator*(Decimal &a, Integer &b) {
+Decimal operator*(Decimal a, Integer b) {
     Decimal db = b.get_value().c_str();
-    return a + db;
+    return a * db;
 }
-Decimal operator/(Decimal &a, Integer &b) {
+Decimal operator/(Decimal a, Integer b) {
     Decimal db = b.get_value().c_str();
-    return a + db;
+    return a / db;
 }
-Decimal operator+(Integer &a, Decimal &b) {
+Decimal operator+(Integer a, Decimal b) {
     Decimal da = a.get_value().c_str();
     return da + b;
 }
-Decimal operator-(Integer &a, Decimal &b) {
+Decimal operator-(Integer a, Decimal b) {
     Decimal da = a.get_value().c_str();
-    return da + b;
+    return da - b;
 }
-Decimal operator*(Integer &a, Decimal &b) {
+Decimal operator*(Integer a, Decimal b) {
     Decimal da = a.get_value().c_str();
-    return da + b;
+    return da * b;
 }
-Decimal operator/(Integer &a, Decimal &b) {
+Decimal operator/(Integer a, Decimal b) {
     Decimal da = a.get_value().c_str();
-    return da + b;
+    return da / b;
 }
-Decimal operator/(Integer &a, Integer &b) {
+Decimal operator/(Integer a, Integer b) {
     Decimal db = a.get_value().c_str();
     Decimal da = a.get_value().c_str();
-    return da + db;
+    return da / db;
 }
 
 /*

@@ -22,10 +22,10 @@ class Integer : public NumberObject {
     Integer& operator=(const Integer &);
     friend std::ostream& operator<<(std::ostream &out, Integer integer);
     friend std::istream& operator>>(std::istream &in, Integer &integer);
-    friend Integer operator+(Integer &a, Integer &b);
     friend Integer operator-(Integer &integer);
-    friend Integer operator-(Integer &a, Integer &b);
-    friend Integer operator*(Integer &a, Integer &b);
+    friend Integer operator+(Integer a, Integer b);
+    friend Integer operator-(Integer a, Integer b);
+    friend Integer operator*(Integer a, Integer b);
     friend bool operator<(Integer &a, Integer &b);
     friend bool operator>(Integer &a, Integer &b);
     // friend Integer operator/(Integer &a, Integer &b);
